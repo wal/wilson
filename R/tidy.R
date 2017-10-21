@@ -5,6 +5,8 @@ data <- read.csv('data/wta_matches_2017.csv')
 dim(data)
 str(data)
 
+data %>% filter(is.na(minutes))
+
 winner_data <- data %>% 
   rename(
     S1stIn = w_1stIn, 
