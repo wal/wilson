@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "---\ntitle: \"WTA 2017 - Statistics\"\nauthor: \"Wal McConnell\"\ndate: \"21 October 2017\"\noutput: html_document\n---\n\n```{r setup, include=FALSE}\nknitr::opts_chunk$set(echo = TRUE)\n```\n\n## Dataset\n\nRetrieved from https://github.com/JeffSackmann/tennis_wta\n\n```{r cars}\nsummary(cars)\n```\n\n## Including Plots\n\nYou can also embed plots, for example:\n\n```{r pressure, echo=FALSE}\nplot(pressure)\n```\n\nNote that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.\n",
+    "created" : 1508584616678.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1108910982",
+    "id" : "38685655",
+    "lastKnownWriteTime" : 1508584711,
+    "last_content_update" : 1508584711275,
+    "path" : "~/projects/wal/wilson/R/wta_2017.Rmd",
+    "project_path" : "R/wta_2017.Rmd",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 7,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}
