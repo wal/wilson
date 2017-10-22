@@ -1,6 +1,5 @@
 rm(list=ls())
 library(tidyverse)
-library(caret)
 
 trainTestSplit <- function(df,trainPercent,seed1){
   samp_size <- floor(trainPercent/100 * nrow(df))

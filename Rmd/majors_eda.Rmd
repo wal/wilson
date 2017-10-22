@@ -1,0 +1,185 @@
+---
+title: "WTA Majors - EDA"
+author: "Wal McConnell"
+date: "10/21/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(forcats)
+knitr::opts_chunk$set(echo = TRUE)
+data <- read.csv('../data/tidy_dataset_wta_2017.csv') 
+majors_data <- data %>% filter(tourney_name %in% c(
+  "Australian Open",
+  "Roland Garros",
+  "Wimbledon",
+  "Us Open"
+))
+wins_data <- majors_data %>% filter(Win == 1)
+tournament_wins <- wins_data %>% filter(round == 'F')
+finals <- wins_data %>% filter(round %in% c('QF', 'SF', 'F'))
+
+losses_data <- majors_data %>% filter(Win == 0)
+```
+
+
+
+```{r}
+dim(majors_data)
+str(majors_data)
+```
+
+## NA's
+
+```{r}
+sapply(majors_data, function(x) {sum(is.na(x))})
+```
+
+
+## Age ?
+
+
+### Averge age of tournament winners ?
+
+```{r}
+mean(majors_data$age)
+mean(tournament_wins$age)
+```
+
+# Oldest v Youngest ?
+```{r}
+wins_data %>% 
+  mutate(age_diff = age - Op_age) %>% 
+  arrange(age_diff) %>% 
+  select(tourney_name, name, opponent, round, age, Op_age, age_diff)
+
+
+#ggplot(wins_data, aes(ht)) + geom_histogram(binwidth = 5)
+
+```
+
+
+
+# Match Duration
+
+```{r}
+
+wins_data %>% 
+  group_by(tourney_name) %>%
+  summarise(avg_mins = mean(minutes, na.rm = TRUE),
+            min = min(minutes, na.rm = TRUE),
+            max = max(minutes, na.rm = TRUE))
+
+shortest_games <- wins_data %>% 
+  filter(minutes < 55) %>% 
+  select(score, minutes, tourney_name, name, opponent) %>% 
+  arrange(minutes)
+
+
+longest_games <- wins_data %>% 
+  filter(minutes >180) %>% 
+  select(score, minutes, tourney_name, name, opponent) %>% 
+  arrange(minutes)
+
+
+
+
+max(wins_data$minutes, na.rm = TRUE)
+min(wins_data$minutes, na.rm = TRUE)
+
+wins_data %>% filter(minutes < 40)
+mean(tournament_wins$minutes, na.rm=TRUE)
+
+
+majors_data %>% 
+  group_by(name) %>% 
+  summarise(total_mins = sum(minutes), n = n(), am = ) %>% 
+  arrange(desc(total_mins))
+
+```
+
+### Most Matches
+```{r}
+
+majors_data %>% 
+  group_by(name, surface) %>% 
+  summarise(n = n(), wins = sum(Win), losses = n - wins) %>% 
+  arrange(desc(wins))
+```
+
+
+```{r}
+majors_data %>% 
+  group_by(name, surface) %>% 
+  summarise(n = n(), wins = sum(Win), losses = n - wins) %>% 
+  arrange(losses)
+
+```
+
+## Wins having lost first set
+
+```{r}
+wins_data_with_sets <- wins_data %>% 
+  separate(score, c("Set1", "Set2", "Set3"), sep=" ", remove = FALSE)
+
+wins_with_first_round_losses <- wins_data_with_sets %>% filter(grepl("^[0-5]-", Set1) | grepl("^6-7", Set1))
+
+wins_with_first_round_losses %>% group_by(tourney_name) %>% summarise(n = n()) %>% arrange(desc(n))
+```
+
+## Double Faults by round
+
+
+```{r}
+
+
+
+names(majors_data)
+majors_data %>% filter(round == 'F') %>% select(tourney_name, df)
+
+by_round <- majors_data %>% 
+  group_by(tourney_name, round) %>% 
+  summarise(df = sum(df, na.rm = TRUE),
+            svpt = sum(svpt, na.rm = TRUE),
+            ace = sum(ace, na.rm = TRUE),
+            S1stIn = sum(S1stIn, na.rm = TRUE),
+            pct_ace = ace/svpt * 100,
+            pct_df = df/svpt *100)
+
+rounds_levels <- c("R128", "R64", "R32", "R16", "QF", "SF", "F")
+by_round$round <- factor(by_round$round, rounds_levels)
+
+
+ggplot(by_round, aes(round, pct_ace, group = tourney_name, color = tourney_name)) + geom_line()
+ggplot(by_round, aes(round, pct_df, group = tourney_name, color = tourney_name)) + geom_line()
+
+
+```
+## Wins by country
+
+```{r}
+
+non_us_open <- wins_data %>% filter(tourney_name != 'Us Open')
+508/4
+
+wins_by_country <- 
+  wins_data %>% group_by(ioc, tourney_name) %>% summarise(n = n()) %>% mutate(pct = n/127 * 100) %>% arrange(desc(n))
+
+
+unique_by_ioc <- majors_data %>% group_by(ioc, name) %>% summarise(matches = n())
+
+
+dds <- unique_by_ioc %>% group_by(ioc) %>% summarise(nap = n()) %>% mutate(pct = nap/184) %>% arrange(desc(pct))
+sum(dds$nap)
+
+
+sum(wins_by_country$n)
+
+
+ggplot(wins_by_country, 
+       aes(fct_reorder(ioc,n ), n)) + geom_bar(stat = "identity") + coord_flip()
+
+
+```
+
